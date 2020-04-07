@@ -1,4 +1,4 @@
-function generateTickets(tickets) {
+exports.generateTickets = function generateTickets(tickets) {
     var cols, finalTicket, finalTickets = [], colPlaceholder = [];
     for (b = 0; b < tickets; b++) {
         cols = Array(9).fill(2);
@@ -22,6 +22,7 @@ function generateTickets(tickets) {
         }
         finalTickets.push(finalTicket);
     }
+    return finalTickets;
 }
 function sortNumbersinArray (a, b) {
     return a > b ? 1 : b > a ? -1 : 0;
@@ -46,6 +47,3 @@ function randomNumber(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-module.exports = {
-    generateTickets: generateTickets
-  }
