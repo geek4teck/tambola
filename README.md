@@ -32,4 +32,7 @@ let tickets = tambola.generateTickets(5); // This generates 5 Tickets and return
   [ [ 5, 0, 0, 0, 47, 0, 69, 0, 88 ],
     [ 6, 12, 0, 32, 0, 53, 70, 76, 0 ],
     [ 0, 19, 24, 38, 50, 0, 0, 78, 0 ] ] ]*/
+
+let tickets = tambola.getDrawSequence(); // This generates 90 Unique Random numbers between 1 & 90
+
 ```

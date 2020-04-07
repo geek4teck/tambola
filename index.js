@@ -1,4 +1,4 @@
-exports.generateTickets = function generateTickets(tickets) {
+function generateTickets(tickets) {
     var cols, finalTicket, finalTickets = [], colPlaceholder = [];
     for (b = 0; b < tickets; b++) {
         cols = Array(9).fill(2);
@@ -24,10 +24,14 @@ exports.generateTickets = function generateTickets(tickets) {
     }
     return finalTickets;
 }
+function getDrawSequence()
+{
+    return (getUniqueRandomNumber(1,90,90,false));
+}
 function sortNumbersinArray (a, b) {
     return a > b ? 1 : b > a ? -1 : 0;
 }
-function getUniqueRandomNumber (min, max, count) {
+function getUniqueRandomNumber (min, max, count,sort = true) {
     var random = [];
     for (var i = 0; i < count; i++) {
         flag = true;
@@ -39,6 +43,7 @@ function getUniqueRandomNumber (min, max, count) {
             }
         }
     }
+    if (sort)
     random.sort(sortNumbersinArray)
     return random;
 }
@@ -47,3 +52,8 @@ function randomNumber(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+module.exports = {
+    'generateTickets': generateTickets,
+    'getDrawSequence':getDrawSequence
+  }
+
