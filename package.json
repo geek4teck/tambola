@@ -1,0 +1,29 @@
+{
+  "name": "tambola",
+  "version": "1.0.0",
+  "description": "Tambola/Housie Game Tickets Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geek4teck/tambola"
+  },
+  "bugs": {
+    "url": "https://github.com/geek4teck/tambola/issues"
+  },
+  "homepage": "https://github.com/geek4teck/tambola/blob/master/README.md",
+  "keywords": [
+    "Tambola",
+    "Housie",
+    "Tambola",
+    "Tambola Ticket Generator",
+    "Ticket Generator",
+    "Housie Ticket Generator",
+    "Housie Ticket",
+    "Tambola Tickets"
+  ],
+  "author": "Vishal Goyal",
+  "license": "ISC"
+}
