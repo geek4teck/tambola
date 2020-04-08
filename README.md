@@ -15,7 +15,7 @@ npm install tambola --save
 ```
 import tambola from 'tambola';
 
-let tickets = tambola.generateTicket(); // This generates a standard Tambola Ticket
+let ticket = tambola.generateTicket(); // This generates a standard Tambola Ticket
 
 /* [ [ 4, 0, 21, 31, 0, 0, 64, 71, 85 ],
     [ 0, 11, 0, 0, 0, 58, 70, 74, 0 ],
