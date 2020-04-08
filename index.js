@@ -1,6 +1,6 @@
-function generateTickets(tickets) {
-    var cols, finalTicket, finalTickets = [], colPlaceholder = [];
-    for (b = 0; b < tickets; b++) {
+function generateTicket() {
+    var cols, finalTicket, flag = true, colPlaceholder = [];
+   while(flag) {
         cols = Array(9).fill(2);
         finalTicket = Array(3);
         finalTicket[0] = Array(9).fill(0);
@@ -20,9 +20,37 @@ function generateTickets(tickets) {
                 finalTicket[colPlaceholder[i][j]][i] = nums[j];
             }
         }
-        finalTickets.push(finalTicket);
+        //Test Final Ticket
+        flag = testFinalTicket(finalTicket);
     }
-    return finalTickets;
+    return finalTicket;
+}
+Array.prototype.count = function(obj){
+    var count = this.length;
+    if(typeof(obj) !== "undefined"){
+      var array = this.slice(0), count = 0; // clone array and reset count
+      for(i = 0; i < array.length; i++){
+        if(array[i] == obj){ count++ }
+      }
+    }
+    return count;
+  }
+function testFinalTicket(ticket){
+
+    for (i=0;i<3;i++)
+    {
+        var arr = ticket[i];
+        count = 0;
+        for (j=0;j<arr.length;j++)
+        {
+            if (arr[j] === 0)
+            count++;
+        }
+        if (count != 4)
+        return true;
+        //return true;
+    }
+    return false;
 }
 function getDrawSequence()
 {
@@ -52,8 +80,10 @@ function randomNumber(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+console.log(generateTicket());
+
 module.exports = {
-    'generateTickets': generateTickets,
+    'generateTicket': generateTicket,
     'getDrawSequence':getDrawSequence
   }
 
