@@ -1,4 +1,4 @@
-# tambola
+# Tambola Ticket Generator
 
 A barebones Node.js module to generate Tambola/Housie Tickets.
 
@@ -21,6 +21,6 @@ let ticket = tambola.generateTicket(); // This generates a standard Tambola Tick
     [ 0, 11, 0, 0, 0, 58, 70, 74, 0 ],
     [ 0, 0, 28, 40, 43, 59, 0, 0, 87 ] ] */
 
-let tickets = tambola.getDrawSequence(); // This generates 90 Unique Random numbers between 1 & 90
+let sequence = tambola.getDrawSequence(); // This generates 90 Unique Random numbers between 1 & 90
 
 ```

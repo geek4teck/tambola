@@ -20,7 +20,6 @@ function generateTicket() {
                 finalTicket[colPlaceholder[i][j]][i] = nums[j];
             }
         }
-        //Test Final Ticket
         flag = testFinalTicket(finalTicket);
     }
     return finalTicket;
@@ -28,7 +27,7 @@ function generateTicket() {
 Array.prototype.count = function(obj){
     var count = this.length;
     if(typeof(obj) !== "undefined"){
-      var array = this.slice(0), count = 0; // clone array and reset count
+      var array = this.slice(0), count = 0;
       for(i = 0; i < array.length; i++){
         if(array[i] == obj){ count++ }
       }
@@ -48,7 +47,6 @@ function testFinalTicket(ticket){
         }
         if (count != 4)
         return true;
-        //return true;
     }
     return false;
 }
