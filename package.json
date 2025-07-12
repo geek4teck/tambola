@@ -1,10 +1,12 @@
 {
   "name": "tambola",
-  "version": "3.0.3",
+  "version": "4.0.0",
   "description": "Tambola/Housie Game Standard Ticket Generator",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -25,5 +27,8 @@
     "Tambola Tickets"
   ],
   "author": "Vishal Goyal",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
 }
