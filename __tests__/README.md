@@ -35,6 +35,14 @@ Command Line Interface tests:
 - Error handling and validation
 - CLI argument parsing
 
+### `node-compatibility.test.js`
+Node.js compatibility tests:
+- Basic module loading
+- Variable scoping validation
+- CLI module loading
+- Package.json structure validation
+- Node.js 16.x+ compatibility
+
 ### `test-helpers.js`
 Utility functions for testing:
 - `validateTambolaTicket()` - Validates tambola ticket structure and rules
