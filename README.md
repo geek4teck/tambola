@@ -45,7 +45,43 @@ npm install tambola --save
 
 ## Usage
 
-### CommonJS
+### Command Line Interface (CLI)
+
+The package includes a CLI for quick ticket and sequence generation:
+
+```bash
+# Generate a tambola ticket
+tambola ticket
+
+# Generate multiple tickets
+tambola ticket -c 5
+
+# Generate ticket in JSON format
+tambola ticket -f json -p
+
+# Generate draw sequence
+tambola sequence
+
+# Generate multiple sequences
+tambola sequence -c 3
+
+# Save output to file
+tambola ticket -o tickets.json
+tambola sequence -f csv -o draw.csv
+
+# Show help
+tambola --help
+```
+
+#### CLI Options
+- `--count, -c <number>`: Number of items to generate (1-100)
+- `--format, -f <format>`: Output format (table, json, csv, array)
+- `--pretty, -p`: Pretty print JSON output
+- `--output, -o <file>`: Save output to file
+
+### Programmatic Usage
+
+#### CommonJS
 ```js
 const tambola = require('tambola');
 
@@ -145,6 +181,18 @@ npm run test:watch
 npm run test:coverage
 ```
 
+### Run Example
+```bash
+npm run example
+```
+
+### Run CLI
+```bash
+npm run cli -- --help
+npm run cli -- ticket
+npm run cli -- sequence
+```
+
 ### Test Coverage Goals
 - Branches: 80%+
 - Functions: 80%+
@@ -163,6 +211,9 @@ npm run test:coverage
 ```
 tambola/
   index.js              # Main module (API)
+  bin/
+    tambola.js          # CLI executable
+  example.js            # Example usage script
   package.json          # Metadata and scripts
   README.md             # This file
   __tests__/

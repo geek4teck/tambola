@@ -27,6 +27,14 @@ Performance and stress tests:
 - Memory usage monitoring
 - Performance consistency
 
+### `cli.test.js`
+Command Line Interface tests:
+- Help and version commands
+- Ticket generation in various formats
+- Sequence generation in various formats
+- Error handling and validation
+- CLI argument parsing
+
 ### `test-helpers.js`
 Utility functions for testing:
 - `validateTambolaTicket()` - Validates tambola ticket structure and rules

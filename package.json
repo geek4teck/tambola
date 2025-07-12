@@ -3,10 +3,15 @@
   "version": "4.0.0",
   "description": "Tambola/Housie Game Standard Ticket Generator",
   "main": "index.js",
+  "bin": {
+    "tambola": "./bin/tambola.js"
+  },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "example": "node example.js",
+    "cli": "node bin/tambola.js"
   },
   "repository": {
     "type": "git",
