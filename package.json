@@ -33,6 +33,9 @@
   ],
   "author": "Vishal Goyal",
   "license": "ISC",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "devDependencies": {
     "jest": "^29.7.0"
   }

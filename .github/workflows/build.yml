@@ -23,14 +23,26 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Verify package.json
+      run: |
+        echo "Checking package.json..."
+        node -e "console.log('Package name:', require('./package.json').name)"
+        node -e "console.log('Package version:', require('./package.json').version)"
+        node -e "console.log('Main file exists:', require('fs').existsSync(require('./package.json').main))"
+        node -e "console.log('Bin file exists:', require('fs').existsSync(require('./package.json').bin.tambola))"
+      
     - name: Run tests
       run: npm test
       
     - name: Run CLI tests
       run: |
+        echo "Testing CLI version..."
         npm run cli -- --version
+        echo "Testing CLI help..."
         npm run cli -- --help
+        echo "Testing CLI ticket generation..."
         npm run cli -- ticket -c 1
+        echo "Testing CLI sequence generation..."
         npm run cli -- sequence -c 1
       
     - name: Test example

@@ -77,9 +77,13 @@ jobs:
     - name: Test CLI functionality
       run: |
         # Test CLI commands
+        echo "Testing CLI version..."
         npm run cli -- --version
+        echo "Testing CLI help..."
         npm run cli -- --help
+        echo "Testing CLI ticket generation..."
         npm run cli -- ticket -c 1 -f json
+        echo "Testing CLI sequence generation..."
         npm run cli -- sequence -c 1 -f json
         echo "CLI tests passed"
         
