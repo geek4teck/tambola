@@ -1,7 +1,8 @@
 # Tambola Ticket Generator
 
 [![npm version](https://img.shields.io/npm/v/tambola.svg)](https://www.npmjs.com/package/tambola)
-[![Build Status](https://img.shields.io/github/workflow/status/geek4teck/tambola/CI)](https://github.com/geek4teck/tambola/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/geek4teck/tambola/build.yml?branch=main)](https://github.com/geek4teck/tambola/actions/workflows/build.yml)
+[![Test Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)](https://github.com/geek4teck/tambola)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](LICENSE)
 
 A robust, well-tested Node.js module to generate standard Tambola (a.k.a. Housie/Bingo) tickets and draw sequences, following all official game rules.
@@ -216,10 +217,19 @@ tambola/
   example.js            # Example usage script
   package.json          # Metadata and scripts
   README.md             # This file
+  .github/
+    workflows/
+      build.yml         # Build status workflow
+      ci.yml            # Full CI/CD pipeline
+      release.yml       # Automated releases
+    ISSUE_TEMPLATE/     # Issue templates
+    pull_request_template.md
+    dependabot.yml      # Dependency updates
   __tests__/
     tambola.test.js     # Main test suite
     helper-functions.test.js
     performance.test.js
+    cli.test.js         # CLI tests
     test-helpers.js     # Test utilities
     README.md           # Test documentation
 ```
@@ -230,13 +240,39 @@ tambola/
 
 Contributions, bug reports, and feature requests are welcome!
 
+### Development Setup
 1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature`)
-3. Make your changes and add tests
-4. Run the test suite (`npm test`)
-5. Submit a pull request
+2. Clone your fork: `git clone https://github.com/your-username/tambola.git`
+3. Install dependencies: `npm install`
+4. Create a new branch: `git checkout -b feature/your-feature`
+5. Make your changes and add tests
+6. Run the test suite: `npm test`
+7. Run the example: `npm run example`
+8. Test CLI functionality: `npm run cli -- --help`
+9. Commit your changes: `git commit -m "feat: add new feature"`
+10. Push to your fork: `git push origin feature/your-feature`
+11. Submit a pull request
 
-Please follow the existing code style and add/modify tests as appropriate.
+### CI/CD Pipeline
+This project uses GitHub Actions for continuous integration:
+- **Build Status**: Tests run on Node.js 16, 18, and 20
+- **Code Quality**: Automated testing and coverage reporting
+- **Security**: Dependency vulnerability scanning
+- **Automated Releases**: Tag-based releases to npm
+
+### Pull Request Guidelines
+- Follow the existing code style
+- Add tests for new functionality
+- Update documentation if needed
+- Ensure all tests pass
+- Test CLI functionality
+- Use conventional commit messages
+
+### Issue Templates
+We provide templates for:
+- 🐛 Bug reports
+- ✨ Feature requests
+- 📝 Documentation improvements
 
 ---
 
