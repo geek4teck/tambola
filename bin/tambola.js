@@ -1,29 +1,49 @@
 #!/usr/bin/env node
 
 /**
- * Tambola CLI - Command Line Interface for Tambola Ticket Generator
+ * @fileoverview Tambola CLI - Command Line Interface
  * 
- * Usage:
- *   tambola ticket [options]     Generate tambola tickets
- *   tambola sequence [options]    Generate draw sequence
- *   tambola --help               Show help
- *   tambola --version            Show version
+ * Professional command-line interface for generating Tambola tickets
+ * and draw sequences with multiple output formats.
+ * 
+ * @author Vishal Goyal
+ * @version 4.1.0
+ * @license ISC
  */
 
-const tambola = require('../index.js');
+const fs = require('fs');
 const path = require('path');
+const tambola = require('../index.js');
 
-// Get package version
+// Configuration constants
+const CLI_CONFIG = {
+  MIN_COUNT: 1,
+  MAX_COUNT: 100,
+  DEFAULT_COUNT: 1,
+  SUPPORTED_TICKET_FORMATS: ['table', 'json', 'csv'],
+  SUPPORTED_SEQUENCE_FORMATS: ['array', 'json', 'csv'],
+  DEFAULT_TICKET_FORMAT: 'table',
+  DEFAULT_SEQUENCE_FORMAT: 'array',
+  TABLE_WIDTH: 35,
+  EXIT_CODES: {
+    SUCCESS: 0,
+    ERROR: 1,
+  },
+};
+
+// Package metadata
 const packageJson = require('../package.json');
-const version = packageJson.version;
+const VERSION = packageJson.version;
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const command = args[0];
+// Command line arguments
+const ARGS = process.argv.slice(2);
+const COMMAND = ARGS[0];
 
-// Help text
-const helpText = `
-🎯 Tambola CLI - Command Line Interface
+/**
+ * Help text for the CLI
+ */
+const HELP_TEXT = `
+🎯 Tambola CLI - Professional Command Line Interface
 
 Usage:
   tambola <command> [options]
@@ -35,13 +55,13 @@ Commands:
   version              Show version
 
 Options for ticket command:
-  --count, -c <number>    Number of tickets to generate (default: 1)
+  --count, -c <number>    Number of tickets to generate (1-100, default: 1)
   --format, -f <format>   Output format: table, json, csv (default: table)
   --pretty, -p           Pretty print JSON output
   --output, -o <file>    Save output to file
 
 Options for sequence command:
-  --count, -c <number>    Number of sequences to generate (default: 1)
+  --count, -c <number>    Number of sequences to generate (1-100, default: 1)
   --format, -f <format>   Output format: array, json, csv (default: array)
   --pretty, -p           Pretty print JSON output
   --output, -o <file>    Save output to file
@@ -56,32 +76,46 @@ Examples:
 For more information, visit: https://github.com/geek4teck/tambola
 `;
 
-// Parse options from command line arguments
-function parseOptions(args) {
+/**
+ * Parses command line arguments into structured options
+ * 
+ * @param {string[]} args - Command line arguments
+ * @param {string} command - The main command (ticket/sequence)
+ * @returns {Object} Parsed options object
+ * 
+ * @example
+ * const options = parseOptions(['-c', '5', '-f', 'json'], 'ticket');
+ * // Returns: { count: 5, format: 'json', pretty: false, output: null }
+ */
+const parseOptions = (args, command) => {
+  const defaultFormat = command === 'sequence' || command === 'sequences' 
+    ? CLI_CONFIG.DEFAULT_SEQUENCE_FORMAT 
+    : CLI_CONFIG.DEFAULT_TICKET_FORMAT;
+
   const options = {
-    count: 1,
-    format: command === 'sequence' || command === 'sequences' ? 'array' : 'table',
+    count: CLI_CONFIG.DEFAULT_COUNT,
+    format: defaultFormat,
     pretty: false,
-    output: null
+    output: null,
   };
 
-  for (let i = 1; i < args.length; i++) {
+  for (let i = 1; i < args.length; i += 1) {
     const arg = args[i];
     const nextArg = args[i + 1];
 
     switch (arg) {
       case '--count':
       case '-c':
-        if (nextArg && !isNaN(nextArg)) {
-          options.count = parseInt(nextArg);
-          i++; // Skip next argument
+        if (nextArg && !Number.isNaN(Number(nextArg))) {
+          options.count = parseInt(nextArg, 10);
+          i += 1; // Skip next argument
         }
         break;
       case '--format':
       case '-f':
         if (nextArg) {
           options.format = nextArg.toLowerCase();
-          i++; // Skip next argument
+          i += 1; // Skip next argument
         }
         break;
       case '--pretty':
@@ -92,212 +126,276 @@ function parseOptions(args) {
       case '-o':
         if (nextArg) {
           options.output = nextArg;
-          i++; // Skip next argument
+          i += 1; // Skip next argument
         }
+        break;
+      default:
+        // Ignore unknown options
         break;
     }
   }
 
   return options;
-}
+};
 
-// Format ticket as table
-function formatTicketAsTable(ticket) {
+/**
+ * Validates CLI options and throws error if invalid
+ * 
+ * @param {Object} options - Parsed options
+ * @param {string} command - The main command
+ * @throws {Error} If options are invalid
+ */
+const validateOptions = (options, command) => {
+  // Validate count
+  if (options.count < CLI_CONFIG.MIN_COUNT || options.count > CLI_CONFIG.MAX_COUNT) {
+    throw new Error(`Count must be between ${CLI_CONFIG.MIN_COUNT} and ${CLI_CONFIG.MAX_COUNT}`);
+  }
+
+  // Validate format based on command
+  const supportedFormats = command === 'sequence' || command === 'sequences'
+    ? CLI_CONFIG.SUPPORTED_SEQUENCE_FORMATS
+    : CLI_CONFIG.SUPPORTED_TICKET_FORMATS;
+
+  if (!supportedFormats.includes(options.format)) {
+    throw new Error(`Unsupported format: ${options.format}. Supported formats: ${supportedFormats.join(', ')}`);
+  }
+};
+
+/**
+ * Formats a ticket as an ASCII table
+ * 
+ * @param {number[][]} ticket - 3x9 ticket array
+ * @returns {string} Formatted table string
+ * 
+ * @example
+ * const table = formatTicketAsTable(ticket);
+ * console.log(table);
+ */
+const formatTicketAsTable = (ticket) => {
   const lines = [];
-  lines.push('┌' + '─'.repeat(35) + '┐');
+  const horizontalLine = '─'.repeat(CLI_CONFIG.TABLE_WIDTH);
   
+  // Top border
+  lines.push(`┌${horizontalLine}┐`);
+  
+  // Ticket rows
   ticket.forEach((row, index) => {
     const formattedRow = row.map(cell => {
       if (cell === 0) return '  ';
       return cell.toString().padStart(2, ' ');
     }).join(' │ ');
+    
     lines.push(`│ ${formattedRow} │`);
     
+    // Add separator between rows (except after last row)
     if (index < ticket.length - 1) {
-      lines.push('├' + '─'.repeat(35) + '┤');
+      lines.push(`├${horizontalLine}┤`);
     }
   });
   
-  lines.push('└' + '─'.repeat(35) + '┘');
+  // Bottom border
+  lines.push(`└${horizontalLine}┘`);
+  
   return lines.join('\n');
-}
+};
 
-// Format ticket as CSV
-function formatTicketAsCSV(ticket) {
+/**
+ * Formats a ticket as CSV
+ * 
+ * @param {number[][]} ticket - 3x9 ticket array
+ * @returns {string} CSV formatted string
+ */
+const formatTicketAsCSV = (ticket) => {
   return ticket.map(row => 
-    row.map(cell => cell === 0 ? '' : cell).join(',')
+    row.map(cell => (cell === 0 ? '' : cell)).join(',')
   ).join('\n');
-}
+};
 
-// Format sequence as array string
-function formatSequenceAsArray(sequence) {
+/**
+ * Formats a sequence as array string
+ * 
+ * @param {number[]} sequence - Array of numbers
+ * @returns {string} Array string representation
+ */
+const formatSequenceAsArray = (sequence) => {
   return `[${sequence.join(', ')}]`;
-}
+};
 
-// Format sequence as CSV
-function formatSequenceAsCSV(sequence) {
+/**
+ * Formats a sequence as CSV
+ * 
+ * @param {number[]} sequence - Array of numbers
+ * @returns {string} CSV formatted string
+ */
+const formatSequenceAsCSV = (sequence) => {
   return sequence.join(',');
-}
+};
 
-// Save output to file
-function saveToFile(content, filename) {
-  const fs = require('fs');
+/**
+ * Saves content to a file
+ * 
+ * @param {string} content - Content to save
+ * @param {string} filename - Target filename
+ * @throws {Error} If file write fails
+ */
+const saveToFile = (content, filename) => {
   try {
-    fs.writeFileSync(filename, content);
+    fs.writeFileSync(filename, content, 'utf8');
     console.log(`✅ Output saved to: ${filename}`);
   } catch (error) {
-    console.error(`❌ Error saving to file: ${error.message}`);
-    process.exit(1);
+    throw new Error(`Failed to save file: ${error.message}`);
   }
-}
+};
 
-// Generate and display tickets
-function generateTickets(options) {
-  const tickets = [];
-  
-  for (let i = 0; i < options.count; i++) {
-    tickets.push(tambola.generateTicket());
-  }
-
-  let output = '';
+/**
+ * Generates and formats tickets based on options
+ * 
+ * @param {Object} options - CLI options
+ * @returns {string} Formatted output string
+ * 
+ * @example
+ * const output = generateTickets({ count: 2, format: 'json', pretty: true });
+ */
+const generateTickets = (options) => {
+  const tickets = Array.from({ length: options.count }, () => tambola.generateTicket());
 
   switch (options.format) {
     case 'table':
       if (options.count === 1) {
-        output = formatTicketAsTable(tickets[0]);
-      } else {
-        tickets.forEach((ticket, index) => {
-          output += `\n📋 Ticket ${index + 1}:\n`;
-          output += formatTicketAsTable(ticket);
-          output += '\n';
-        });
+        return formatTicketAsTable(tickets[0]);
       }
-      break;
-      
-    case 'json':
+      return tickets.map((ticket, index) => 
+        `\n📋 Ticket ${index + 1}:\n${formatTicketAsTable(ticket)}`
+      ).join('\n');
+
+    case 'json': {
       const jsonData = options.count === 1 ? tickets[0] : tickets;
-      output = options.pretty ? 
-        JSON.stringify(jsonData, null, 2) : 
-        JSON.stringify(jsonData);
-      break;
-      
+      return options.pretty 
+        ? JSON.stringify(jsonData, null, 2) 
+        : JSON.stringify(jsonData);
+    }
+
     case 'csv':
       if (options.count === 1) {
-        output = formatTicketAsCSV(tickets[0]);
-      } else {
-        output = tickets.map((ticket, index) => 
-          `Ticket ${index + 1}\n${formatTicketAsCSV(ticket)}`
-        ).join('\n\n');
+        return formatTicketAsCSV(tickets[0]);
       }
-      break;
-      
+      return tickets.map((ticket, index) => 
+        `Ticket ${index + 1}\n${formatTicketAsCSV(ticket)}`
+      ).join('\n\n');
+
     default:
-      console.error(`❌ Unknown format: ${options.format}`);
-      process.exit(1);
+      throw new Error(`Unsupported format: ${options.format}`);
   }
+};
 
-  if (options.output) {
-    saveToFile(output, options.output);
-  } else {
-    console.log(output);
-  }
-}
-
-// Generate and display sequences
-function generateSequences(options) {
-  const sequences = [];
-  
-  for (let i = 0; i < options.count; i++) {
-    sequences.push(tambola.getDrawSequence());
-  }
-
-  let output = '';
+/**
+ * Generates and formats sequences based on options
+ * 
+ * @param {Object} options - CLI options
+ * @returns {string} Formatted output string
+ * 
+ * @example
+ * const output = generateSequences({ count: 2, format: 'json', pretty: true });
+ */
+const generateSequences = (options) => {
+  const sequences = Array.from({ length: options.count }, () => tambola.getDrawSequence());
 
   switch (options.format) {
     case 'array':
       if (options.count === 1) {
-        output = formatSequenceAsArray(sequences[0]);
-      } else {
-        sequences.forEach((seq, index) => {
-          output += `Sequence ${index + 1}: ${formatSequenceAsArray(seq)}\n`;
-        });
+        return formatSequenceAsArray(sequences[0]);
       }
-      break;
-      
-    case 'json':
+      return sequences.map((seq, index) => 
+        `Sequence ${index + 1}: ${formatSequenceAsArray(seq)}`
+      ).join('\n');
+
+    case 'json': {
       const jsonData = options.count === 1 ? sequences[0] : sequences;
-      output = options.pretty ? 
-        JSON.stringify(jsonData, null, 2) : 
-        JSON.stringify(jsonData);
-      break;
-      
+      return options.pretty 
+        ? JSON.stringify(jsonData, null, 2) 
+        : JSON.stringify(jsonData);
+    }
+
     case 'csv':
       if (options.count === 1) {
-        output = formatSequenceAsCSV(sequences[0]);
-      } else {
-        output = sequences.map((seq, index) => 
-          `Sequence ${index + 1},${formatSequenceAsCSV(seq)}`
-        ).join('\n');
+        return formatSequenceAsCSV(sequences[0]);
       }
-      break;
-      
+      return sequences.map((seq, index) => 
+        `Sequence ${index + 1},${formatSequenceAsCSV(seq)}`
+      ).join('\n');
+
     default:
-      console.error(`❌ Unknown format: ${options.format}`);
-      process.exit(1);
+      throw new Error(`Unsupported format: ${options.format}`);
   }
+};
 
-  if (options.output) {
-    saveToFile(output, options.output);
-  } else {
-    console.log(output);
+/**
+ * Main CLI function
+ * 
+ * Handles command parsing, validation, and execution
+ */
+const main = () => {
+  try {
+    // Show help
+    if (!COMMAND || COMMAND === 'help' || COMMAND === '--help' || COMMAND === '-h') {
+      console.log(HELP_TEXT);
+      process.exit(CLI_CONFIG.EXIT_CODES.SUCCESS);
+    }
+
+    // Show version
+    if (COMMAND === 'version' || COMMAND === '--version' || COMMAND === '-v') {
+      console.log(`🎯 Tambola CLI v${VERSION}`);
+      process.exit(CLI_CONFIG.EXIT_CODES.SUCCESS);
+    }
+
+    // Parse and validate options
+    const options = parseOptions(ARGS, COMMAND);
+    validateOptions(options, COMMAND);
+
+    // Execute command
+    let output;
+    switch (COMMAND) {
+      case 'ticket':
+      case 'tickets':
+        output = generateTickets(options);
+        break;
+        
+      case 'sequence':
+      case 'sequences':
+        output = generateSequences(options);
+        break;
+        
+      default:
+        throw new Error(`Unknown command: ${COMMAND}`);
+    }
+
+    // Output result
+    if (options.output) {
+      saveToFile(output, options.output);
+    } else {
+      console.log(output);
+    }
+
+    process.exit(CLI_CONFIG.EXIT_CODES.SUCCESS);
+  } catch (error) {
+    console.error(`❌ Error: ${error.message}`);
+    console.log('\nRun "tambola help" for usage information');
+    process.exit(CLI_CONFIG.EXIT_CODES.ERROR);
   }
-}
+};
 
-// Main CLI logic
-function main() {
-  // Show help
-  if (!command || command === 'help' || command === '--help' || command === '-h') {
-    console.log(helpText);
-    return;
-  }
-
-  // Show version
-  if (command === 'version' || command === '--version' || command === '-v') {
-    console.log(`🎯 Tambola CLI v${version}`);
-    return;
-  }
-
-  // Parse options
-  const options = parseOptions(args);
-
-  // Validate count
-  if (options.count < 1 || options.count > 100) {
-    console.error('❌ Count must be between 1 and 100');
-    process.exit(1);
-  }
-
-  // Execute command
-  switch (command) {
-    case 'ticket':
-    case 'tickets':
-      generateTickets(options);
-      break;
-      
-    case 'sequence':
-    case 'sequences':
-      generateSequences(options);
-      break;
-      
-    default:
-      console.error(`❌ Unknown command: ${command}`);
-      console.log('\nRun "tambola help" for usage information');
-      process.exit(1);
-  }
-}
-
-// Run CLI
+// Run CLI if this file is executed directly
 if (require.main === module) {
   main();
 }
 
-module.exports = { main, parseOptions, formatTicketAsTable, formatSequenceAsArray }; 
+// Export for testing
+module.exports = {
+  main,
+  parseOptions,
+  validateOptions,
+  formatTicketAsTable,
+  formatSequenceAsArray,
+  generateTickets,
+  generateSequences,
+}; 

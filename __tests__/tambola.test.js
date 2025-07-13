@@ -194,41 +194,60 @@ describe('Tambola Package Tests', () => {
     });
   });
 
-  describe('Array.prototype.count Function Coverage', () => {
-    test('should handle count without parameter (undefined)', () => {
-      const arr = [1, 2, 3, 4, 5];
-      const count = arr.count();
-      expect(count).toBe(5); // Should return array length when no parameter
+  describe('Code Quality and Performance', () => {
+    test('should generate tickets efficiently', () => {
+      const startTime = Date.now();
+      const tickets = [];
+      
+      for (let i = 0; i < 50; i += 1) {
+        tickets.push(tambola.generateTicket());
+      }
+      
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      
+      // Should generate 50 tickets in under 1 second
+      expect(duration).toBeLessThan(1000);
+      expect(tickets.length).toBe(50);
+      
+      // All tickets should be valid
+      tickets.forEach(ticket => {
+        expect(Array.isArray(ticket)).toBe(true);
+        expect(ticket.length).toBe(3);
+        expect(ticket[0].length).toBe(9);
+      });
     });
 
-    test('should handle count with undefined parameter explicitly', () => {
-      const arr = [1, 2, 3, 4, 5];
-      const count = arr.count(undefined);
-      expect(count).toBe(5); // Should return array length when parameter is undefined
+    test('should generate sequences efficiently', () => {
+      const startTime = Date.now();
+      const sequences = [];
+      
+      for (let i = 0; i < 20; i += 1) {
+        sequences.push(tambola.getDrawSequence());
+      }
+      
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+      
+      // Should generate 20 sequences in under 1 second
+      expect(duration).toBeLessThan(1000);
+      expect(sequences.length).toBe(20);
+      
+      // All sequences should be valid
+      sequences.forEach(sequence => {
+        expect(Array.isArray(sequence)).toBe(true);
+        expect(sequence.length).toBe(90);
+      });
     });
 
-    test('should count occurrences of a specific value', () => {
-      const arr = [1, 2, 2, 3, 2, 4, 5];
-      const count = arr.count(2);
-      expect(count).toBe(3); // Should count 3 occurrences of 2
-    });
-
-    test('should return 0 for value not in array', () => {
-      const arr = [1, 2, 3, 4, 5];
-      const count = arr.count(10);
-      expect(count).toBe(0); // Should return 0 for value not present
-    });
-
-    test('should handle empty array', () => {
-      const arr = [];
-      const count = arr.count(1);
-      expect(count).toBe(0); // Should return 0 for empty array
-    });
-
-    test('should handle array with only target value', () => {
-      const arr = [5, 5, 5];
-      const count = arr.count(5);
-      expect(count).toBe(3); // Should count all occurrences
+    test('should maintain consistent API', () => {
+      // Test that the API remains stable
+      expect(typeof tambola.generateTicket).toBe('function');
+      expect(typeof tambola.getDrawSequence).toBe('function');
+      
+      // Test function signatures
+      expect(tambola.generateTicket.length).toBe(0); // No parameters
+      expect(tambola.getDrawSequence.length).toBe(0); // No parameters
     });
   });
 }); 

@@ -117,7 +117,7 @@ describe('CLI Tests', () => {
       const result = await runCLI(['ticket', '-f', 'invalid']);
       
       expect(result.code).toBe(1);
-      expect(result.stderr).toContain('Unknown format');
+      expect(result.stderr).toContain('Unsupported format');
     });
   });
 
