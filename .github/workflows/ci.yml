@@ -12,7 +12,7 @@ jobs:
     
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x, 22.x]
+        node-version: [16, 18, 20, 22]
     
     steps:
     - name: Checkout code
@@ -31,15 +31,6 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
-      
-    - name: Run linting (if eslint is added later)
-      run: |
-        if [ -f "package.json" ] && grep -q "eslint" package.json; then
-          npm run lint
-        else
-          echo "No linting configured, skipping..."
-        fi
-      continue-on-error: true
       
     - name: Run tests
       run: npm test
@@ -67,12 +58,12 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
+        node-version: '18'
         cache: 'npm'
         
     - name: Install dependencies
       run: npm ci
-      
+        
     - name: Build package
       run: |
         # Test that the package can be built/installed
@@ -109,12 +100,12 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
+        node-version: '18'
         cache: 'npm'
         
     - name: Install dependencies
       run: npm ci
-      
+        
     - name: Run security audit
       run: npm audit --audit-level=moderate
       continue-on-error: true
@@ -140,16 +131,16 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18.x'
+        node-version: '18'
         cache: 'npm'
         registry-url: 'https://registry.npmjs.org'
         
     - name: Install dependencies
       run: npm ci
-      
+        
     - name: Run tests
       run: npm test
-      
+        
     - name: Publish to npm
       run: npm publish
       env:
