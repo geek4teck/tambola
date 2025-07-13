@@ -1,6 +1,6 @@
 {
   "name": "tambola",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Tambola/Housie Game Standard Ticket Generator",
   "main": "index.js",
   "bin": {
